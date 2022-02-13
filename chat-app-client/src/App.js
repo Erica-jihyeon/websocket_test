@@ -1,56 +1,72 @@
+import React, {useState, useEffect} from 'react';
+import io from 'socket.io-client';
+import TextField from '@material-ui/core/TextField';
 import './App.css';
-import { useEffect, useState } from 'react';
-import io from "socket.io-client";
 
+const socket =  io.connect('http://localhost:8080')
 
 function App() {
-  const [socket, setSocket] = useState("");
-  const [name, setName] = useState("");
-  const [notify, setNotify] = useState();
-  const [status, setStatus] = useState({});
-  const [messages, setMessages] = useState([]);
-  const [text, setText] = useState("");
-  const [to, setTo] = useState("");
+  const [state, setState] = useState({message:'', name:''})
+  const [chat,setChat] =useState([])
 
-  const clear = function () {
-    setMessages([]);
-  };
+  useEffect(()=>{
+    socket.on('message',({name,message})=>{
+      setChat([...chat,{name,message}])
+    })
+    socket.on('usercount', (data) => {
+      console.log(data);
+    })
+  })
 
-  // This app makes a websocket connection immediately
-  useEffect(() => {
-    // Connect to server
-    const socket = io("http://localhost:8080");
-    setSocket(socket);
-    
-    socket.on('message', msg => {
-      setText(prev => [`${msg.text}`, ...prev]);
-    });
+  
 
-    
-
-    return () => socket.disconnect();
-  }, []);
-
-  const onTextChange = function(event) {
-    setText(event.target.value);
-  };
-
-  const send = () => {
-    socket && text && socket.emit('message', text );
+  const onTextChange = e =>{
+    setState({...state,[e.target.name]: e.target.value})
   }
-  console.log(text);
 
+  const onMessageSubmit =(e)=>{
+    e.preventDefault()
+    const {name, message} =state
+    socket.emit('message',{name, message})
+    setState({message : '',name})
+  }
+
+
+  const renderChat =()=>{
+    return chat.map(({name, message},index)=>(
+      <div key={index}>
+        <h3>{name}:<span>{message}</span></h3>
+      </div>
+    ))
+  }
 
   return (
-    <div className="App">
-      <h1>Web Sockets React</h1>
-      <ul id="messages"></ul>
-      <form action="">
-        <input onChange={onTextChange} id="m" />
-        <button onClick={send}>Send</button>
+    <div className='card'>
+      <form onSubmit={onMessageSubmit}>
+        <h1>Message</h1>
+        <div className="name-field">
+          <TextField 
+          name ="name" 
+          onChange={e=> onTextChange(e)} 
+          value={state.name}
+          label="Name"/>
+        </div>
+        <div >
+          <TextField 
+          name ="message" 
+          onChange={e=> onTextChange(e)} 
+          value={state.message}
+          id="outlined-multiline-static"
+          variant="outlined"
+          label="Message"/>
+        </div>
+        <button>Send Message</button>
       </form>
-
-    </div >
+      <div className="render-chat">
+        <h1>Chat log</h1>
+        {renderChat()}
+      </div>
+    </div>
   );
 }
 

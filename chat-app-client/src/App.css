@@ -36,53 +36,43 @@
     transform: rotate(360deg);
   }
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 30px;
+  min-height: 30rem;
 }
-
-body {
-  font: 13px Helvetica, Arial;
-}
-
 form {
-  background: #000;
-  padding: 3px;
-  position: fixed;
-  bottom:
-    0;
-  width: 100%;
+  max-width: 350px;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0px 3px 24px -8px rgba(0, 0, 0, 0.75);
 }
 
-form input {
-  border: 0;
+.name-field {
+  margin-bottom: 40px;
+}
+
+button {
+  margin-top: 20px;
   padding: 10px;
-  width: 90%;
-  margin-right: .5%;
+  background: transparent;
+  border-radius: 5px;
 }
 
-form button {
-  width: 9%;
-  background: rgb(130, 224, 255);
-  border:
-    none;
-  padding: 10px;
+.render-chat {
+  max-width: 350px;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0px 3px 24px -8px rgba(0, 0, 0, 0.75);
 }
 
-#messages {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+h3 {
+  color: #2f72da;
 }
 
-#messages li {
-  padding: 5px 10px;
-}
-
-#messages li:nth-child(odd) {
-  background: #eee;
+span {
+  color: black;
 }
 
 
