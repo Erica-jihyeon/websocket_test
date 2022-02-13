@@ -7,14 +7,15 @@ import axios from 'axios';
 function App() {
   const [state, setState] = useState({ message: '', name: '' });
   const [chat, setChat] = useState([]);
-  // const socketRef = useRef();
-  const [socket, setSocket] = useState("");
+  const socketRef = useRef();
+  // const [socket, setSocket] = useState("");
 
   const roomIdRef = useRef(null);
 
   useEffect(() => {
-    const socket = io.connect('http://localhost:8080/matching');
-    setSocket(socket);
+    socketRef.current = io.connect('http://localhost:8080/matching');
+    // const socket = io.connect('http://localhost:8080/matching');
+    // setSocket(socket);
 
     axios.get('http://localhost:8080/test')
       .then((res) => {
@@ -23,7 +24,7 @@ function App() {
       })
       .then(() => {
         // console.log(roomIdRef.current);
-        socket.emit('joinRoom', { roomId: roomIdRef.current });
+        socketRef.current.emit('joinRoom', { roomId: roomIdRef.current });
         // socket.on("message", ({ name, message }) => {
         //   setChat([...chat, { name, message }])
         // });
@@ -33,7 +34,7 @@ function App() {
         console.log(err.message);
       })
 
-    return () => socket.disconnect();
+    // return () => socket.disconnect();
 
   }, [])
 
@@ -58,17 +59,17 @@ function App() {
     // socket.on('usercount', (data) => {
     //   console.log(data);
     // })
-    const socket = io.connect('http://localhost:8080/matching');
-    setSocket(socket);
+    // const socket = io.connect('http://localhost:8080/matching');
+    // setSocket(socket);
 
-    socket.on("message", ({ name, message, roomId }) => {
+    socketRef.current.on("message", ({ name, message, roomId }) => {
       setChat([ ...chat, { name, message } ])
     });
 
-    socket.on('usercount', (data) => {
+    socketRef.current.on('usercount', (data) => {
       console.log(data);
     })
-    return () => socket.disconnect();
+    // return () => socket.disconnect();
 
   }, [chat])
 
@@ -83,7 +84,8 @@ function App() {
     //name = state.name, message = state.message
     const { name, message } = state;
     // socketRef.current.emit('message',{name, message});
-    socket.emit('message', { name, message, roomId: roomIdRef.current });
+    // socket.emit('message', { name, message, roomId: roomIdRef.current });
+    socketRef.current.emit('message', { name, message, roomId: roomIdRef.current });
     setState({ message: '', name });
   }
 
