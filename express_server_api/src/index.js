@@ -77,12 +77,12 @@ io.on('connection', (socket) => {
 
   //socket.emit => to current connected client
   //io.emit => to all clients
-  io.sockets.emit('usercount', io.engine.clientsCount);
+  io.emit('usercount', io.engine.clientsCount);
   console.log(io.engine.clientsCount);
 
   socket.on('message', ({ name, message }) => {
     console.log('Message received: ' + message);
-    io.sockets.emit('message', ({ name, message }))
+    io.emit('message', ({ name, message }))
     // socket.emit('message', ({ name, message }))
   })
 
@@ -100,6 +100,43 @@ io.on('connection', (socket) => {
     io.emit('usercount', io.engine.clientsCount);
   })
 });
+
+//user click start button
+//find matching clients
+//db save
+//get roomId from DB
+//send roomId to the client
+const getMatchingRoomId = () => {
+  const roomNum = Math.floor((Math.random() + 1) * 10);
+  return `room${roomNum}`;
+}
+
+const matchingIo = io.of('/matching')
+matchingIo.on('connection', (socket) => {
+
+  const roomId = getMatchingRoomId()
+
+  matchingIo.emit('usercount', io.engine.clientsCount);
+  // socket.join('room1');
+  console.log(io.engine.clientsCount);
+
+  // socket.on('message', ({ name, message }) => {
+  //   console.log('Message received: ' + message);
+  //   matchingIo.emit('message', ({ name, message }))
+  //   // socket.emit('message', ({ name, message }))
+  // })
+
+  socket.on('joinRoom', () => {
+    console.log('Room joined: ' + roomId);
+    socket.join(roomId);
+  })
+
+  socket.on('message', ({ name, message }) => {
+    matchingIo.in(roomId).emit('message', ({ name, message }))
+  })
+
+})
+
 
 server.listen(port, function () {
   console.log(`Listening on http://localhost: ${port}`);
