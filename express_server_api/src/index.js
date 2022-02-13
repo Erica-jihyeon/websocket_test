@@ -101,11 +101,7 @@ io.on('connection', (socket) => {
   })
 });
 
-//user click start button
-//find matching clients
-//db save
-//get roomId from DB
-//send roomId to the client
+
 
 
 const matchingIo = io.of('/matching')
@@ -129,6 +125,12 @@ matchingIo.on('connection', (socket) => {
 
   socket.on('message', ({ name, message, roomId }) => {
     matchingIo.in(roomId).emit('message', ({ name, message }))
+  })
+
+  socket.on('disconnect', function () {
+    console.log('user disconnected')
+    //update user count
+    matchingIo.emit('usercount', io.engine.clientsCount);
   })
 
 })
