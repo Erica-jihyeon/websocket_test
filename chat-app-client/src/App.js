@@ -1,22 +1,24 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import io from 'socket.io-client';
 import TextField from '@material-ui/core/TextField';
 import './App.css';
 
-const socket =  io.connect('http://localhost:8080')
-
 function App() {
-  const [state, setState] = useState({message:'', name:''})
-  const [chat,setChat] =useState([])
+  const [state, setState] = useState({message:'', name:''});
+  const [chat,setChat] =useState([]);
+  const socketRef = useRef();
 
   useEffect(()=>{
-    socket.on('message',({name,message})=>{
-      setChat([...chat,{name,message}])
-    })
-    socket.on('usercount', (data) => {
+    socketRef.current = io.connect('http://localhost:8080');
+    socketRef.current.on("message", ({ name, message }) => {
+      setChat([ ...chat, { name, message } ])
+    });
+
+    socketRef.current.on('usercount', (data) => {
       console.log(data);
     })
-  })
+    return () => socketRef.current.disconnect();
+  }, [chat])
 
   
 
@@ -27,7 +29,7 @@ function App() {
   const onMessageSubmit =(e)=>{
     e.preventDefault()
     const {name, message} =state
-    socket.emit('message',{name, message})
+    socketRef.current.emit('message',{name, message})
     setState({message : '',name})
   }
 
