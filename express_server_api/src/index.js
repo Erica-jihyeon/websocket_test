@@ -106,15 +106,11 @@ io.on('connection', (socket) => {
 //db save
 //get roomId from DB
 //send roomId to the client
-const getMatchingRoomId = () => {
-  const roomNum = Math.floor((Math.random() + 1) * 10);
-  return `room${roomNum}`;
-}
+
 
 const matchingIo = io.of('/matching')
 matchingIo.on('connection', (socket) => {
 
-  const roomId = getMatchingRoomId()
 
   matchingIo.emit('usercount', io.engine.clientsCount);
   // socket.join('room1');
@@ -126,12 +122,12 @@ matchingIo.on('connection', (socket) => {
   //   // socket.emit('message', ({ name, message }))
   // })
 
-  socket.on('joinRoom', () => {
+  socket.on('joinRoom', ({roomId}) => {
     console.log('Room joined: ' + roomId);
     socket.join(roomId);
   })
 
-  socket.on('message', ({ name, message }) => {
+  socket.on('message', ({ name, message, roomId }) => {
     matchingIo.in(roomId).emit('message', ({ name, message }))
   })
 
